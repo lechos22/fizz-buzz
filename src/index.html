@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fizz Buzz</title>
+  </head>
+  <body>
+    <!-- Title -->
+    <h1>Fizz Buzz</h1>
+
+    <!-- Output -->
+    <p>
+      <span id="n"></span>:
+      <span id="value"></span>
+    </p>
+
+    <!-- Controls -->
+    <p>
+      <button id="prev">Prev</button>
+      <button id="next">Next</button>
+    </p>
+
+    <script>
+      // API connector
+      async function fizzBuzz(n) {
+        const response = await fetch(`/nth/${n}`);
+        const data = await response.json();
+        return data;
+      }
+
+      // View
+      async function render(n) {
+        document.getElementById("n").textContent = n;
+        document.getElementById("value").textContent = await fizzBuzz(n);
+      }
+
+      // State
+      let n = 1;
+      async function prev() {
+        if (n > 1) {
+          await render(--n);
+        }
+      }
+      async function next() {
+        await render(++n);
+      }
+
+      // Init
+      render(n);
+      document.getElementById("prev").addEventListener("click", prev);
+      document.getElementById("next").addEventListener("click", next);
+    </script>
+  </body>
+</html>
