@@ -1,6 +1,9 @@
 use std::error::Error;
 
 use actix_web::{get, web, HttpResponse};
+use log::info;
+
+const ADDRESS: &str = "0.0.0.0:3000";
 
 fn index_html() -> &'static str {
     include_str!("./index.html")
@@ -29,12 +32,20 @@ async fn nth_entry_endpoint(path: web::Path<u64>) -> String {
 
 #[actix_web::main]
 async fn main() -> Result<(), Box<dyn Error>> {
-    actix_web::HttpServer::new(|| {
-        actix_web::App::new()
+    use actix_web::{middleware::Logger, App, HttpServer};
+    use env_logger::Env;
+
+    let env = Env::new().filter_or("RUST_LOG", "info");
+    env_logger::try_init_from_env(env)?;
+    info!("Server starting at http://{}", ADDRESS);
+
+    HttpServer::new(|| {
+        App::new()
+            .wrap(Logger::default())
             .service(index)
             .service(nth_entry_endpoint)
     })
-    .bind("0.0.0.0:3000")?
+    .bind(ADDRESS)?
     .run()
     .await?;
     Ok(())
